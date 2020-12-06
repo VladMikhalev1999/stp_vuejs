@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<style>
+    table {
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+</style>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Список работников</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="responsive-tables.css">
+    <script src="jquery.min.js"></script>
+    <script src="responsive-tables.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+<p><a href="/">Домой</a></p>
+<p><a href="/employees/addEmployee">Добавить сотрудника</a></p>
+<p><a href="/employees/setEmployee">Обновить имя сотрудника</a></p>
+<p><a href="/employees/removeEmployee">Удалить сотрудника</a></p>
+<p><a href="/employees/addEmployeeStatus">Добавить полномочие сотруднику</a></p>
+<p><a href="/employees/removeEmployeeStatus">Убрать полномочие у сотрудника</a></p>
+</body>
+<div id="app">
+
+</div>
+<script>
+    var getEmps = Vue.resource('/employees/getEmployees');
+    Vue.component('employee-row', {
+        props: ['employee'],
+        template: '<tr>'
+            + '<td>{{ employee.id }}</td><td>{{ employee.name }}</td>'
+            + '<td>{{ employee.statuses[0].id }}</td><td>{{ employee.statuses[0].name }}</td></tr>'
+    })
+    Vue.component('employee-table', {
+        props: ['employees'],
+        template: "<table  id=\"main_table\" class=\"responsive\">"
+            + "<thead><tr><th>ИД Сотрудника</th><th>Сотрудник</th><th>ИД Полномочия</th><th>Полномочие</th></tr></thead>"
+            + "<tbody><employee-row v-for='emp in employees' :key='emp.id' :employee='emp' /></tbody></table>",
+        created: function () {
+            getEmps.get().then(result => {
+                result.json().then(data => {
+                    console.log(data)
+                    data.forEach(employee => this.employees.push(employee))
+                })
+            })
+        }
+    })
+    var app = new Vue({
+        el: "#app",
+        template: '<employee-table :employees="emps" />',
+        data: {
+            emps: []
+        },
+    })
+</script>
+
+</html>

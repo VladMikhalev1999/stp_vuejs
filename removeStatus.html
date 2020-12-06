@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Удалить полномочие</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+    <div id="app">
+        <p>
+            <input type="number" id="name" placeholder="ИД Полномочия" v-model="id">
+        </p>
+        <p>
+            <input type="submit" value="Удалить" @click="removeStatus"/>
+            <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
+        </p>
+    </div>
+</body>
+<script>
+    var remStat = Vue.resource('/statuses/removeStatus/{id}')
+    new Vue({
+        el: "#app",
+        data: {
+            id: 0,
+        },
+        methods: {
+            removeStatus: function() {
+                remStat.get({id: this.id}).then(result => {
+                    document.location.href = '/statuses';
+                })
+            }
+        }
+    })
+</script>
+</html>
