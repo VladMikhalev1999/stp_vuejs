@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Добавить полномочие</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+    <div id="app">
+        <p>
+            <label for="name">Имя</label>
+            <input type="text" id="name" placeholder="Имя" v-model="name">
+        </p>
+        <p>
+            <input type="submit" value="Добавить" @click="addEmployee"/>
+            <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
+        </p>
+    </div>
+</body>
+<script>
+    var addEmp = Vue.resource('/employees/addEmployee/{name}')
+    new Vue({
+        el: "#app",
+        data: {
+            name: ''
+        },
+        methods: {
+            addEmployee: function() {
+                addEmp.get({name: this.name}).then(result => {
+                    document.location.href = '/employees';
+                })
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width">
+    <title>Добавить полномочие</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+    <div id="app">
+        <p>
+            <input type="number" id="id" placeholder="ИД" v-model="id">
+            <input type="text" id="name" placeholder="Полномочие" v-model="name">
+        </p>
+        <p>
+            <input type="submit" value="Обновить" @click="setStatus"/>
+            <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
+        </p>
+    </div>
+</body>
+<script>
+    var setStat = Vue.resource('/statuses/setStatus/{id}/{name}')
+    new Vue({
+        el: "#app",
+        data: {
+            id: 0,
+            name: ''
+        },
+        methods: {
+            setStatus: function() {
+                setStat.get({id: this.id, name: this.name}).then(result => {
+                    document.location.href = '/statuses';
+                })
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Удалить полномочие</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+   <div id="app">
+       <p>
+           <input type="number" id="eid" placeholder="ИД Сотрудника" v-model="id">
+           <input type="number" id="sid" placeholder="ИД Полномочия" v-model="name">
+       </p>
+       <p>
+           <input type="submit" value="Добавить" @click="addEmployeeStatus"/>
+           <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
+       </p>
+   </div>
+</body>
+<script>
+    var addEmpStat = Vue.resource('/employees/addEmployeeStatus/{id}/{name}')
+    new Vue({
+        el: "#app",
+        data: {
+            id: 0,
+            name: 0
+        },
+        methods: {
+            addEmployeeStatus: function() {
+                addEmpStat.get({id: this.id, name: this.name}).then(result => {
+                    document.location.href = '/employees';
+                })
+            }
+        }
+    })
+</script>
+</html>

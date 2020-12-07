@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<style>
+    table {
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+</style>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Список полномочий</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="responsive-tables.css">
+    <script src="jquery.min.js"></script>
+    <script src="responsive-tables.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+</head>
+<body>
+<p><a href="/">Домой</a></p>
+<p><a href="/statuses/addStatus">Добавить полномочие</a></p>
+<p><a href="/statuses/setStatus">Обновить полномочие</a></p>
+<p><a href="/statuses/removeStatus">Удалить полномочие</a></p>
+<div id="app">
+
+</div>
+<script>
+    var getEmps = Vue.resource('/statuses/getStatuses');
+    Vue.component('status-row', {
+        props: ['status'],
+        template: '<tr><td>{{ status.id }}</td><td>{{ status.name }}</td>'
+    })
+    Vue.component('status-table', {
+        props: ['statuses'],
+        template: "<table  id=\"main_table\" class=\"responsive\">"
+            + "<thead><tr><th>ИД Полномочия</th><th>Полномочие</th></tr></thead>"
+            + "<tbody><status-row v-for='stat in statuses' :key='stat.id' :status='stat' /></tbody></table>",
+        created: function () {
+            getEmps.get().then(result => {
+                result.json().then(data => {
+                    console.log(data)
+                    data.forEach(status => this.statuses.push(status))
+                })
+            })
+        }
+    })
+    var app = new Vue({
+        el: "#app",
+        template: '<status-table :statuses="stats" />',
+        data: {
+            stats: []
+        },
+    })
+</script>
+</body>
+</html>
