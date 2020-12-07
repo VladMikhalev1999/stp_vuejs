@@ -19,6 +19,7 @@
     <script src="responsive-tables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
 <p><a href="/">Домой</a></p>
@@ -32,33 +33,60 @@
 
 </div>
 <script>
-    var getEmps = Vue.resource('/employees/getEmployees');
+    Vue.use(Vuex)
+    const getEmps = Vue.resource('/employees/getEmployees');
+    const store = new Vuex.Store({
+        actions: {
+            getEmployees: async function(ctx) {
+                let response = await getEmps.get()
+                let data = await response.json()
+                ctx.commit('insertData', data)
+            }
+        },
+        state: {
+            emps: []
+        },
+        mutations: {
+            insertData(state, data) {
+                data.forEach(employee => state.emps.push(employee))
+            }
+        },
+        getters: {
+            getEmps: function(state) {
+                return state.emps
+            }
+        }
+    })
+
     Vue.component('employee-row', {
         props: ['employee'],
-        template: '<tr>'
+        template: '<tr v-if="employee.statuses.length != 0">'
             + '<td>{{ employee.id }}</td><td>{{ employee.name }}</td>'
             + '<td>{{ employee.statuses[0].id }}</td><td>{{ employee.statuses[0].name }}</td></tr>'
+                +
+            '<tr v-else="employee.statuses.length != 0">'
+            + '<td>{{ employee.id }}</td><td>{{ employee.name }}</td>'
+            + '<td>---</td><td>---</td></tr>'
     })
     Vue.component('employee-table', {
-        props: ['employees'],
+        props: ['store'],
         template: "<table  id=\"main_table\" class=\"responsive\">"
             + "<thead><tr><th>ИД Сотрудника</th><th>Сотрудник</th><th>ИД Полномочия</th><th>Полномочие</th></tr></thead>"
-            + "<tbody><employee-row v-for='emp in employees' :key='emp.id' :employee='emp' /></tbody></table>",
-        created: function () {
-            getEmps.get().then(result => {
-                result.json().then(data => {
-                    console.log(data)
-                    data.forEach(employee => this.employees.push(employee))
-                })
-            })
+            + "<tbody><employee-row v-for='emp in allEmps' :key='emp.id' :employee='emp' /></tbody></table>",
+        created: function() {
+            this.store.dispatch('getEmployees')
+        },
+        computed: {
+            allEmps: function() {
+                return this.store.getters.getEmps
+            }
         }
+
     })
     var app = new Vue({
         el: "#app",
-        template: '<employee-table :employees="emps" />',
-        data: {
-            emps: []
-        },
+        store,
+        template: '<employee-table :store="$store" />',
     })
 </script>
 

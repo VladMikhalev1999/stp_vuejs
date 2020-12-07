@@ -7,30 +7,48 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="app">
         <p>
-            <input type="number" id="name" placeholder="ИД Полномочия" v-model="id">
+            <input type="number" id="id" placeholder="ИД Полномочия">
         </p>
         <p>
-            <input type="submit" value="Удалить" @click="removeStatus"/>
+            <input type="submit" value="Удалить" @click="dispatch"/>
             <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
         </p>
     </div>
 </body>
 <script>
+    Vue.use(Vuex)
     var remStat = Vue.resource('/statuses/removeStatus/{id}')
+    const store = new Vuex.Store({
+        actions: {
+            removeStatus: async function(ctx) {
+                ctx.commit('updateId', document.getElementById('id').value)
+                await remStat.get({id: ctx.state.sid})
+                ctx.commit('backToStatuses')
+            }
+        },
+        state: {
+            sid: 0
+        },
+        mutations: {
+            updateId: function(state, id) {
+                state.sid = id
+            },
+            backToStatuses: function(state) {
+                document.location.href = '/statuses'
+            }
+        }
+    })
     new Vue({
         el: "#app",
-        data: {
-            id: 0,
-        },
+        store,
         methods: {
-            removeStatus: function() {
-                remStat.get({id: this.id}).then(result => {
-                    document.location.href = '/statuses';
-                })
+            dispatch: function() {
+                this.$store.dispatch('removeStatus')
             }
         }
     })
