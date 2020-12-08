@@ -7,32 +7,51 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="app">
         <p>
-            <input type="number" id="id" placeholder="ИД" v-model="id">
-            <input type="text" id="name" placeholder="Имя" v-model="name">
+            <input type="number" id="id" placeholder="ИД">
+            <input type="text" id="name" placeholder="Имя">
         </p>
         <p>
-            <input type="submit" value="Обновить" @click="setEmployee"/>
+            <input type="submit" value="Обновить" @click="dispatch"/>
             <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
         </p>
     </div>
 </body>
 <script>
+    Vue.use(Vuex)
     var setEmp = Vue.resource('/employees/setEmployee/{id}/{name}')
+    const store = new Vuex.Store({
+        actions: {
+            setEmployee: async function(ctx) {
+                ctx.commit('updateIdName', {id: document.getElementById('id').value, name: document.getElementById('name').value})
+                await setEmp.get({id: ctx.state.eid, name: ctx.state.ename})
+                ctx.commit('backToEmployees')
+            }
+        },
+        state: {
+            eid: 0,
+            ename: ''
+        },
+        mutations: {
+            updateIdName: function(state, data) {
+                state.eid = data.id
+                state.ename = data.name
+            },
+            backToEmployees: function(state) {
+                document.location.href = '/employees'
+            }
+        }
+    })
     new Vue({
         el: "#app",
-        data: {
-            id: 0,
-            name: ''
-        },
+        store,
         methods: {
-            setEmployee: function() {
-                setEmp.get({id: this.id, name: this.name}).then(result => {
-                    document.location.href = '/employees';
-                })
+            dispatch: function() {
+                this.$store.dispatch('setEmployee')
             }
         }
     })

@@ -7,32 +7,50 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="app">
     <p>
         <label for="name">Название</label>
-        <input type="text" id="name" placeholder="Название" v-model="name">
+        <input type="text" id="name" placeholder="Название">
     </p>
     <p>
-        <input type="submit" value="Добавить" @click="addStatus"/>
+        <input type="submit" value="Добавить" @click="dispatch"/>
         <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
     </p>
 </div>
 
 </body>
 <script>
-    var addStat = Vue.resource('/statuses/addStatus/{name}')
-    new Vue({
-        el: "#app",
-        data: {
+    Vue.use(Vuex)
+    const addStat = Vue.resource('/statuses/addStatus/{name}')
+    const store = new Vuex.Store({
+        actions: {
+            addStatus: async function(ctx) {
+                ctx.commit('updateName', document.getElementById('name').value)
+                await addStat.get({name: ctx.state.name})
+                ctx.commit('backToStatuses')
+            }
+        },
+        state: {
             name: ''
         },
+        mutations: {
+            updateName: function(state, data) {
+                state.name = data
+            },
+            backToStatuses: function(state) {
+                document.location.href = '/statuses'
+            }
+        }
+    })
+    new Vue({
+        el: "#app",
+        store,
         methods: {
-            addStatus: function() {
-                addStat.get({name: this.name}).then(result => {
-                    document.location.href = '/statuses';
-                })
+            dispatch: function() {
+                this.$store.dispatch('addStatus')
             }
         }
     })

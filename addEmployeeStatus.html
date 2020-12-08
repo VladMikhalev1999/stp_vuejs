@@ -8,32 +8,51 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
    <div id="app">
        <p>
-           <input type="number" id="eid" placeholder="ИД Сотрудника" v-model="id">
-           <input type="number" id="sid" placeholder="ИД Полномочия" v-model="name">
+           <input type="number" id="eid" placeholder="ИД Сотрудника">
+           <input type="number" id="sid" placeholder="ИД Полномочия">
        </p>
        <p>
-           <input type="submit" value="Добавить" @click="addEmployeeStatus"/>
+           <input type="submit" value="Добавить" @click="dispatch"/>
            <input type="submit" onclick="javascript:history.back(); return false;" value="Отмена">
        </p>
    </div>
 </body>
 <script>
-    var addEmpStat = Vue.resource('/employees/addEmployeeStatus/{id}/{name}')
+    Vue.use(Vuex)
+    const addEmpStat = Vue.resource('/employees/addEmployeeStatus/{id}/{name}')
+    const store = new Vuex.Store({
+        actions: {
+            addEmployeeStatus: async function(ctx) {
+                ctx.commit('updateIds', {eid: document.getElementById('eid').value, sid: document.getElementById('sid').value})
+                await addEmpStat.get({id: ctx.state.eid, name: ctx.state.sid})
+                ctx.commit('backToEmployees')
+            }
+        },
+        state: {
+            eid: 0,
+            sid: 0,
+        },
+        mutations: {
+            updateIds: function(state, data) {
+                state.eid = data.eid
+                state.sid = data.sid
+            },
+            backToEmployees: function(state) {
+                document.location.href = '/employees'
+            }
+        }
+    })
     new Vue({
         el: "#app",
-        data: {
-            id: 0,
-            name: 0
-        },
+        store,
         methods: {
-            addEmployeeStatus: function() {
-                addEmpStat.get({id: this.id, name: this.name}).then(result => {
-                    document.location.href = '/employees';
-                })
+            dispatch: function() {
+                this.$store.dispatch('addEmployeeStatus')
             }
         }
     })
