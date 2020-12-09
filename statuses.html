@@ -16,9 +16,6 @@
     <link rel="stylesheet" href="responsive-tables.css">
     <script src="jquery.min.js"></script>
     <script src="responsive-tables.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
 <p><a href="/">Домой</a></p>
@@ -28,54 +25,6 @@
 <div id="app">
 
 </div>
-<script>
-    Vue.use(Vuex)
-    const getEmps = Vue.resource('/statuses/getStatuses')
-    const store = new Vuex.Store({
-        actions: {
-            getStatuses: async function(ctx) {
-                let response = await getEmps.get()
-                let data = await response.json()
-                ctx.commit('insertData', data)
-            }
-        },
-        state: {
-            stats: []
-        },
-        mutations: {
-            insertData: function(state, data) {
-                data.forEach(status => state.stats.push(status))
-            }
-        },
-        getters: {
-            getStats: function(state) {
-                return state.stats
-            }
-        }
-    })
-    Vue.component('status-row', {
-        props: ['status'],
-        template: '<tr><td>{{ status.id }}</td><td>{{ status.name }}</td></tr>'
-    })
-    Vue.component('status-table', {
-        props: ['store'],
-        template: "<table  id=\"main_table\" class=\"responsive\">"
-            + "<thead><tr><th>ИД Полномочия</th><th>Полномочие</th></tr></thead>"
-            + "<tbody><status-row v-for='stat in allStats' :key='stat.id' :status='stat' /></tbody></table>",
-        created: function () {
-            this.store.dispatch('getStatuses')
-        },
-        computed: {
-            allStats: function() {
-                return this.store.getters.getStats
-            }
-        }
-    })
-    var app = new Vue({
-        el: "#app",
-        store,
-        template: '<status-table :store="$store" />',
-    })
-</script>
+<script src="script/statuses.js"></script>
 </body>
 </html>

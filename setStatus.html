@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width">
     <title>Изменить полномочие</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="app">
@@ -21,39 +18,5 @@
         </p>
     </div>
 </body>
-<script>
-    Vue.use(Vuex)
-    const setStat = Vue.resource('/statuses/setStatus/{id}/{name}')
-    const store = new Vuex.Store({
-        actions: {
-            setStatus: async function(ctx) {
-                ctx.commit('updateIdName', {id: document.getElementById('id').value, name: document.getElementById('name').value})
-                await setStat.get({id: ctx.state.sid, name: ctx.state.sname})
-                ctx.commit('backToStatuses')
-            }
-        },
-        state: {
-            sid: 0,
-            sname: ''
-        },
-        mutations: {
-            updateIdName: function(state, data) {
-                state.sid = data.id
-                state.sname = data.name
-            },
-            backToStatuses: function(state) {
-                document.location.href = '/statuses'
-            }
-        }
-    })
-    new Vue({
-        el: "#app",
-        store,
-        methods: {
-            dispatch: function() {
-                this.$store.dispatch('setStatus')
-            }
-        }
-    })
-</script>
+<script src="script/setStat.js"></script>
 </html>

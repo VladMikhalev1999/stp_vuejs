@@ -5,9 +5,6 @@
     <title>Удалить полномочие</title>
     <meta name="viewport" content="width=device-width">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="app">
@@ -21,39 +18,5 @@
         </p>
     </div>
 </body>
-<script>
-    Vue.use(Vuex)
-    var remEmpStat = Vue.resource('/employees/removeEmployeeStatus/{id}/{name}')
-    const store = new Vuex.Store({
-        actions: {
-            removeEmployeeStatus: async function(ctx) {
-                ctx.commit('updateIds', {eid: document.getElementById('eid').value, sid: document.getElementById('sid').value})
-                await remEmpStat.get({id: ctx.state.eid, name: ctx.state.sid})
-                ctx.commit('backToEmployees')
-            }
-        },
-        state: {
-            eid: 0,
-            sid: 0,
-        },
-        mutations: {
-            updateIds: function(state, data) {
-                state.eid = data.eid
-                state.sid = data.sid
-            },
-            backToEmployees: function(state) {
-                document.location.href = '/employees'
-            }
-        }
-    })
-    new Vue({
-        el: "#app",
-        store,
-        methods: {
-            dispatch: function() {
-                this.$store.dispatch('removeEmployeeStatus')
-            }
-        }
-    })
-</script>
+<script src="script/remEmpStat.js"></script>
 </html>
