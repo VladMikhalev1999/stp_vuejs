@@ -5,9 +5,6 @@
     <title>Добавить полномочие</title>
     <meta name="viewport" content="width=device-width">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.min.js" integrity="sha512-n/iV5SyKXzLRbRczKU75fMgHO0A1DWJSWbK5llLNAqdcoxtUK3NfgfszYpjhvcEqS6nEXwu7gQ5bIkx6z8/lrA==" crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="app">
@@ -22,37 +19,5 @@
 </div>
 
 </body>
-<script>
-    Vue.use(Vuex)
-    const addStat = Vue.resource('/statuses/addStatus/{name}')
-    const store = new Vuex.Store({
-        actions: {
-            addStatus: async function(ctx) {
-                ctx.commit('updateName', document.getElementById('name').value)
-                await addStat.get({name: ctx.state.name})
-                ctx.commit('backToStatuses')
-            }
-        },
-        state: {
-            name: ''
-        },
-        mutations: {
-            updateName: function(state, data) {
-                state.name = data
-            },
-            backToStatuses: function(state) {
-                document.location.href = '/statuses'
-            }
-        }
-    })
-    new Vue({
-        el: "#app",
-        store,
-        methods: {
-            dispatch: function() {
-                this.$store.dispatch('addStatus')
-            }
-        }
-    })
-</script>
+<script src="script/addStat.js"></script>
 </html>
